@@ -74,6 +74,52 @@ long double Vector::setDZ( long double ndz ) {
 	dz = ndz;
 	return old;
 }
+long double Vector::getR() {
+	return std::pow( dx * dx + dy * dy + dz * dz, .5 );
+}
+long double Vector::getPhi() {
+	if( dx == 0 ) {
+		return 0;
+	}
+	return std::atan( dy / dx );
+}
+long double Vector::getTheta() {
+	if( getR() == 0 ) {
+		return 0;
+	}
+	return std::atan( dz / getR() );
+}
+long double Vector::setR( long double nr ) {
+	long double old = getR();
+	if( old == 0 ) {
+		return 0;
+	}
+	dx *= nr / getR();
+	dy *= nr / getR();
+	dz *= nr / getR();
+	return old;
+}
+long double Vector::setPhi( long double nPhi ) {
+	long double r = getR();
+	if( r == 0 ) {
+		return 0;
+	}
+	long double oldPhi = getPhi();
+	dx = r * std::sin( getTheta() ) * std::cos( nPhi );
+	dy = r * std::sin( getTheta() ) * std::sin( nPhi );
+	return oldPhi;
+}
+long double Vector::setTheta( long double nTheta ) {
+	long double r = getR();
+	if( r == 0 ) {
+		return 0;
+	}
+	long double oldTheta = getTheta();
+	dz = r * std::cos( nTheta );
+	dx = r * std::sin( nTheta ) * std::cos( getPhi() );
+	dy = r * std::sin( nTheta ) * std::sin( getPhi() );
+	return oldTheta;
+}
 Line::Line( long double nx, long double ny, long double nz, long double ndx, long double ndy, long double ndz ) {
 	setX( nx );
 	setY( ny );

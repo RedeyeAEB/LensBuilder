@@ -32,6 +32,12 @@ namespace Geometry {
 			long double setDX( long double ndx );
 			long double setDY( long double ndy );
 			long double setDZ( long double ndz );
+			long double setR( long double nr );
+			long double setTheta( long double nTheta );
+			long double setPhi( long double nPhi );
+			long double getR();
+			long double getTheta();
+			long double getPhi();
 	};
 	class Line: public Point, public Vector {
 		public:
