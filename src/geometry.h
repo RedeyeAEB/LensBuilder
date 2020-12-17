@@ -1,5 +1,7 @@
+#ifndef GEOMETRY_H
+#define GEOMETRY_H
+
 #include <iostream>
-#pragma once
 
 namespace Geometry {
 	class Point {
@@ -16,7 +18,7 @@ namespace Geometry {
 			long double setX( long double nx );
 			long double setY( long double ny );
 			long double setZ( long double nz );
-			long double getDistance( Point p );
+			long double getDistance( Point &p );
 	};
 	class Vector {
 		private:
@@ -43,20 +45,22 @@ namespace Geometry {
 		public:
 			Line();
 			Line( long double nx, long double ny, long double nz, long double ndx, long double ndy, long double ndz );
-			Line( Point np, long double ndx, long double ndy, long double ndz );
-			Line( Point np, Vector nd );
-			Line( Point a, Point b );
+			Line( Point &np, long double ndx, long double ndy, long double ndz );
+			Line( Point &np, Vector &nd );
+			Line( Point &a, Point &b );
 	};
 	class Sphere: public Point {
 		private:
 			long double r;
 		public:
 			Sphere( long double x, long double y, long double z, long double r );
-			Sphere( Point p, long double r );
+			Sphere( Point &p, long double r );
 			long double getR();
 			long double setR( long double nr );
-			bool containsPoint( Point p );
-			Point* getIntersection( Line l );
-			Vector* getNormal( Point p );
+			bool containsPoint( Point &p );
+			Point* getIntersection( Line &l );
+			Vector* getNormal( Point &p );
 	};
 }	
+
+#endif

@@ -37,7 +37,7 @@ long double Point::setZ( long double nz ) {
 	z = nz;
 	return old;
 }
-long double Point::getDistance( Point p ) {
+long double Point::getDistance( Point &p ) {
 	return std::pow( std::pow( x - p.getX(), 2 ) + std::pow( y - p.getY(), 2 ) + std::pow( z - p.getZ(), 2 ), .5 );
 }
 Vector::Vector() {
@@ -120,6 +120,7 @@ long double Vector::setTheta( long double nTheta ) {
 	dy = r * std::sin( nTheta ) * std::sin( getPhi() );
 	return oldTheta;
 }
+Line::Line() {}
 Line::Line( long double nx, long double ny, long double nz, long double ndx, long double ndy, long double ndz ) {
 	setX( nx );
 	setY( ny );
@@ -128,7 +129,7 @@ Line::Line( long double nx, long double ny, long double nz, long double ndx, lon
 	setDY( ndy );
 	setDZ( ndz );
 }
-Line::Line( Point np, long double ndx, long double ndy, long double ndz ) {
+Line::Line( Point &np, long double ndx, long double ndy, long double ndz ) {
 	setX( np.getX() );
 	setY( np.getY() );
 	setZ( np.getZ() );
@@ -136,7 +137,7 @@ Line::Line( Point np, long double ndx, long double ndy, long double ndz ) {
 	setDY( ndy );
 	setDZ( ndz );
 }
-Line::Line( Point np, Vector nd ) {
+Line::Line( Point &np, Vector &nd ) {
 	setX( np.getX() );
 	setY( np.getY() );
 	setZ( np.getZ() );
@@ -144,7 +145,7 @@ Line::Line( Point np, Vector nd ) {
 	setDY( nd.getDY() );
 	setDZ( nd.getDZ() );
 }
-Line::Line( Point a, Point b ) {
+Line::Line( Point &a, Point &b ) {
 	setX( a.getX() );
 	setY( a.getY() );
 	setZ( a.getZ() );
@@ -158,17 +159,17 @@ Sphere::Sphere( long double nx, long double ny, long double nz, long double nr )
 	setZ( nz );
 	r = nr;
 }
-Sphere::Sphere( Point p, long double nr ) {
+Sphere::Sphere( Point &p, long double nr ) {
 	setX( p.getX() );
 	setY( p.getY() );
 	setZ( p.getZ() );
 	r = nr;
 }
-bool Sphere::containsPoint( Point p ) {
+bool Sphere::containsPoint( Point &p ) {
 	return ( std::pow( p.getX() - getX(), 2 ) + std::pow( p.getY() - getY(), 2 ) + std::pow( p.getZ() - getZ(), 2 ) ) < std::pow( r, 2 );
 }
 // Treats line as a vector with a given starting point. Intersections of the line behind the starting point will be ignored. Returns the closest intersection found, or nullptr if none is found.
-Point* Sphere::getIntersection( Line l ) {	// http://www.ambrsoft.com/TrigoCalc/Sphere/SpherLineIntersection_.htm
+Point* Sphere::getIntersection( Line &l ) {	// http://www.ambrsoft.com/TrigoCalc/Sphere/SpherLineIntersection_.htm
 	long double alpha = l.getDX();
 	long double beta = l.getDY();
 	long double gamma = l.getDZ();
@@ -198,6 +199,6 @@ Point* Sphere::getIntersection( Line l ) {	// http://www.ambrsoft.com/TrigoCalc/
 	}
 	return nullptr;	// Return null pointer
 }
-Vector* Sphere::getNormal( Point p ) {	
+Vector* Sphere::getNormal( Point &p ) {	
 	return new Vector( p.getX() - getX(), p.getY() - getY(), p.getZ() - getZ() );	// Use gradient to determine normal
 }

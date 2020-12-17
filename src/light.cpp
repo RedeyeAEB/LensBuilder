@@ -27,7 +27,7 @@ Ray::Ray( long double nx, long double ny, long double nz, long double nTheta, lo
 	setPhi( nPhi );
 	wavelength = nwl;
 }
-Ray::Ray( Point c, Vector d, long double nwl ) {
+Ray::Ray( Point &c, Vector &d, long double nwl ) {
 	setX( c.getX() );
 	setY( c.getY() );
 	setZ( c.getZ() );
