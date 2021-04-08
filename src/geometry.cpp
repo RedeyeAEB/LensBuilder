@@ -77,6 +77,9 @@ long double Vector::setDZ( long double ndz ) {
 long double Vector::getR() {
 	return std::pow( dx * dx + dy * dy + dz * dz, .5 );
 }
+long double Vector::getMagnitude() {
+    return getR();
+}
 long double Vector::getPhi() {
 	if( dx == 0 ) {
 		return 0;
@@ -119,6 +122,22 @@ long double Vector::setTheta( long double nTheta ) {
 	dx = r * std::sin( nTheta ) * std::cos( getPhi() );
 	dy = r * std::sin( nTheta ) * std::sin( getPhi() );
 	return oldTheta;
+}
+Vector Vector::getUnitVector() {
+    return Vector(dx/getMagnitude(), dy/getMagnitude(), dz/getMagnitude());
+}
+long double Vector::getDotProduct( Vector &o ) {
+    return o.getDX() * dx + o.getDY() * dy + o.getDZ() * dz;
+}
+Vector Vector::getCrossProduct( Vector &o ) {
+    long double ndx = dy * o.getDZ() - dz * o.getDY();
+    long double ndy = dz * o.getDX() - dx * o.getDZ();
+    long double ndz = dx * o.getDY() - dy * o.getDX();
+
+    return Vector(ndx, ndy, ndz);
+}
+glm::vec3 Vector::glmvec3()  {
+    return glm::vec3(dx,dy,dz);
 }
 Line::Line() {}
 Line::Line( long double nx, long double ny, long double nz, long double ndx, long double ndy, long double ndz ) {
@@ -164,6 +183,14 @@ Sphere::Sphere( Point &p, long double nr ) {
 	setY( p.getY() );
 	setZ( p.getZ() );
 	r = nr;
+}
+long double Sphere::getR() {
+    return r;
+}
+long double Sphere::setR( long double nr ) {
+    long double old = r;
+    r = nr;
+    return old;
 }
 bool Sphere::containsPoint( Point &p ) {
 	return ( std::pow( p.getX() - getX(), 2 ) + std::pow( p.getY() - getY(), 2 ) + std::pow( p.getZ() - getZ(), 2 ) ) < std::pow( r, 2 );

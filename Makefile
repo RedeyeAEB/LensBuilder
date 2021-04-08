@@ -1,7 +1,7 @@
 # Compiler settings - Can be customized.
 CC = g++
-CXXFLAGS = -std=c++11 -Wall $(shell pkg-config gtkmm-3.0 --cflags --libs ) -g
-LDFLAGS = 
+CXXFLAGS = -std=c++11 -Wall $(shell pkg-config gtkmm-3.0 glfw3 --static --cflags --libs ) -g
+LDFLAGS = -lglfw -lGLEW
 
 # Makefile settings - Can be customized.
 APPNAME = LensBuilder
@@ -32,7 +32,7 @@ $(APPNAME): $(OBJ)
 	$(CC) $(CXXFLAGS) -o $@ $^ $(LDFLAGS)
 
 # Creates the dependecy rules
-%.d: $(SRCDIR)/%$(EXT)
+%.d: $(SRCDIR)/%$(EXT)tpp
 	@$(CPP) $(CFLAGS) $< -MM -MT $(@:%.d=$(OBJDIR)/%.o) >$@
 
 # Includes all .h files

@@ -1,0 +1,10 @@
+#ifndef LENSBUILDER_CONTROLS_H
+#define LENSBUILDER_CONTROLS_H
+
+
+class controls {
+
+};
+
+
+#endif //LENSBUILDER_CONTROLS_H

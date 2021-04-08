@@ -3,6 +3,8 @@
 
 #include <iostream>
 
+#include <glm/glm.hpp>
+
 namespace Geometry {
 	class Point {
 		private:
@@ -38,8 +40,15 @@ namespace Geometry {
 			long double setTheta( long double nTheta );
 			long double setPhi( long double nPhi );
 			long double getR();
+			long double getMagnitude(); // Same thing as getR()
 			long double getTheta();
 			long double getPhi();
+
+            Vector getUnitVector();
+			long double getDotProduct( Vector &o );
+			Vector getCrossProduct( Vector &o );
+
+			glm::vec3 glmvec3();
 	};
 	class Line: public Point, public Vector {
 		public:
