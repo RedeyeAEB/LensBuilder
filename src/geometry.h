@@ -48,6 +48,12 @@ namespace Geometry {
 			long double getDotProduct( Vector &o );
 			Vector getCrossProduct( Vector &o );
 
+			long double getAngleBetween( Vector &o );
+
+			// https://en.wikipedia.org/wiki/Rodrigues'_rotation_formula
+            Vector rotateVectorRadians(Vector &rotateAxis, long double radians);
+            //Vector rotateVectorDegrees(Vector &rotateAxis, long double degrees);
+
 			glm::vec3 glmvec3();
 	};
 	class Line: public Point, public Vector {
@@ -58,7 +64,7 @@ namespace Geometry {
 			Line( Point &np, Vector &nd );
 			Line( Point &a, Point &b );
 	};
-	class Sphere: public Point {
+	class Sphere: public Point {    // Negative radii are properly encoded, positive bulges left
 		private:
 			long double r;
 		public:
@@ -68,8 +74,17 @@ namespace Geometry {
 			long double setR( long double nr );
 			bool containsPoint( Point &p );
 			Point* getIntersection( Line &l );
+			std::pair<Point, Point>* getIntersections(Line &I);
 			Vector* getNormal( Point &p );
 	};
-}	
+    class Plane: public Line {
+    // No privates required - the coordinate and normal are encoded in the public Line
+    public:
+        Plane();
+        Plane(long double x, long double y, long double z, long double dx, long double dy, long double dz);
+        Geometry::Point* getIntersection(Geometry::Line &l); // Return nullptr if no intersection, Point if intersection
+
+    };
+}
 
 #endif

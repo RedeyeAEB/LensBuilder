@@ -66,3 +66,108 @@ long double Optic::Lens::getRadiusFront() {
 long double Optic::Lens::getRadiusBack() {
     return s2->getR();
 }
+#pragma message ("getClosesValidIntersection methods only work with a axis vector of <0, 1, 1> centered on z axis")
+Geometry::Point* Optic::Lens::getClosestValidIntersectionFront(Light::Ray &r) {  // Return nullptr if no intersection exists
+    std::pair<Geometry::Point, Geometry::Point>* intersections = s1->getIntersections(r);
+    if(intersections == nullptr) {  // Obvious case, no intersections whatsoever
+        return nullptr;
+    }
+    if(s1->getR() >= 0) {    // Positive curvature, only front side is valid
+        if(intersections->first.getZ()<=intersections->second.getZ()) { // If first point is the front one
+            Geometry::Point* p = new Geometry::Point(intersections->first.getX(), intersections->first.getY(), intersections->first.getZ());
+            if(sqrt(p->getX()*p->getX()+p->getY()*p->getY())>getRadius()) { // Ensures the radius isn't out of bounds
+                return nullptr;
+            }
+            return p;
+        } else {
+            Geometry::Point* p = new Geometry::Point(intersections->second.getX(), intersections->second.getY(), intersections->second.getZ());
+            if(sqrt(p->getX()*p->getX()+p->getY()*p->getY())>getRadius()) { // Ensures the radius isn't out of bounds
+                return nullptr;
+            }
+            return p;
+        }
+    } else {    // Negative curvature, only back side of sphere is valid
+        if(intersections->first.getZ()>=intersections->second.getZ()) { // If first point is the back one
+            Geometry::Point* p = new Geometry::Point(intersections->first.getX(), intersections->first.getY(), intersections->first.getZ());
+            if(sqrt(p->getX()*p->getX()+p->getY()*p->getY())>getRadius()) { // Ensures the radius isn't out of bounds
+                return nullptr;
+            }
+            return p;
+        } else {
+            Geometry::Point* p = new Geometry::Point(intersections->second.getX(), intersections->second.getY(), intersections->second.getZ());
+            if(sqrt(p->getX()*p->getX()+p->getY()*p->getY())>getRadius()) { // Ensures the radius isn't out of bounds
+                return nullptr;
+            }
+            return p;
+        }
+    }
+}
+Geometry::Point* Optic::Lens::getClosestValidIntersectionBack(Light::Ray &r) {
+    std::pair<Geometry::Point, Geometry::Point>* intersections = s2->getIntersections(r);
+    if(intersections == nullptr) {
+        return nullptr;
+    }
+    if(s2->getR() >= 0) {    // Positive curvature, only front side is valid
+        if(intersections->first.getZ()<=intersections->second.getZ()) { // If first point is the front one
+            Geometry::Point* p = new Geometry::Point(intersections->first.getX(), intersections->first.getY(), intersections->first.getZ());
+            if(sqrt(p->getX()*p->getX()+p->getY()*p->getY())>getRadius()) { // Ensures the radius isn't out of bounds
+                return nullptr;
+            }
+            return p;
+        } else {
+            Geometry::Point* p = new Geometry::Point(intersections->second.getX(), intersections->second.getY(), intersections->second.getZ());
+            if(sqrt(p->getX()*p->getX()+p->getY()*p->getY())>getRadius()) { // Ensures the radius isn't out of bounds
+                return nullptr;
+            }
+            return p;
+        }
+    } else {    // Negative curvature, only back side of sphere is valid
+        if(intersections->first.getZ()>=intersections->second.getZ()) { // If first point is the back one
+            Geometry::Point* p = new Geometry::Point(intersections->first.getX(), intersections->first.getY(), intersections->first.getZ());
+            if(sqrt(p->getX()*p->getX()+p->getY()*p->getY())>getRadius()) { // Ensures the radius isn't out of bounds
+                return nullptr;
+            }
+            return p;
+        } else {
+            Geometry::Point* p = new Geometry::Point(intersections->second.getX(), intersections->second.getY(), intersections->second.getZ());
+            if(sqrt(p->getX()*p->getX()+p->getY()*p->getY())>getRadius()) { // Ensures the radius isn't out of bounds
+                return nullptr;
+            }
+            return p;
+        }
+    }
+}
+std::vector<Light::Ray> Optic::Lens::raytracePath(Light::Ray &r) {
+    std::vector<Light::Ray> path;   // Storage variable
+
+    // First, determine the path of light after being refracted by the front surface.
+      // Get surface normal
+    Geometry::Point* intersection = getClosestValidIntersectionFront(r);
+    if(intersection == nullptr) {   // Return empty vector to signify end of the path
+        return path;
+    }
+    Geometry::Vector n = *(s1->getNormal(*(intersection)));
+      // Get angle to surface normal -> this is theta1
+    long double theta1 = 180 - r.getAngleBetween(n);    // Needs 108 adjustment from opposite normal direction
+      // Use snell's to get theta2
+    long double theta2 = asin(1/getIndex()*sin(theta1));
+    Geometry::Line theAxis = getAxis();
+    Geometry::Vector rotationalAxis = n.getCrossProduct(theAxis);
+      // Duplicate the ray, rotate it, add to path
+    Light::Ray r1(intersection->getX(), intersection->getY(), intersection->getZ(), r.getDX(), r.getDY(), r.getDZ(), r.getWavelength(), r.getIntensity());
+    r1.rotateVectorRadians(rotationalAxis, theta1-theta2);
+    path.push_back(r1);
+    // Second, determine the intersection between that refracted light and the back surface.
+    intersection = getClosestValidIntersectionBack(r);
+    if(intersection == nullptr) {
+        return path;
+    }
+    n = *(s2->getNormal(*(intersection)));
+    theta1 = r.getAngleBetween(n);  // Does not need 180 normal adjustment
+    theta2 = asin(getIndex()*sin(theta1));
+    rotationalAxis = n.getCrossProduct(theAxis);
+    Light::Ray r2(intersection->getX(), intersection->getY(), intersection->getZ(), r.getDX(), r.getDY(), r.getDZ(), r.getWavelength(), r.getIntensity());
+    path.push_back(r2);
+    // Return the results if a successful output has occurred.
+    return path;
+}

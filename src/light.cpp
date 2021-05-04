@@ -9,7 +9,7 @@ Ray::Ray() {
 Ray::Ray( long double nwl ) {
 	wavelength = nwl;
 }
-Ray::Ray( long double nx, long double ny, long double nz, long double ndx, long double ndy, long double ndz, long double nwl ) {
+Ray::Ray( long double nx, long double ny, long double nz, long double ndx, long double ndy, long double ndz, long double nwl, unsigned long ni ) {
 	setX( nx );
 	setY( ny );
 	setZ( nz );
@@ -17,8 +17,9 @@ Ray::Ray( long double nx, long double ny, long double nz, long double ndx, long 
 	setDY( ndy );
 	setDZ( ndz );
 	wavelength = nwl;
+	intensity = ni;
 }
-Ray::Ray( long double nx, long double ny, long double nz, long double nTheta, long double nPhi, long double nwl ) {
+Ray::Ray( long double nx, long double ny, long double nz, long double nTheta, long double nPhi, long double nwl, unsigned long ni ) {
 	setX( nx );
 	setY( ny );
 	setZ( nz );
@@ -26,6 +27,7 @@ Ray::Ray( long double nx, long double ny, long double nz, long double nTheta, lo
 	setTheta( nTheta );
 	setPhi( nPhi );
 	wavelength = nwl;
+	intensity = ni;
 }
 Ray::Ray( Point &c, Vector &d, long double nwl ) {
 	setX( c.getX() );
@@ -43,4 +45,12 @@ long double Ray::setWavelength( long double nwl ) {
 }
 long double Ray::getWavelength() {
 	return wavelength;
+}
+unsigned long Ray::setIntensity(unsigned long ni) {
+    unsigned long old = intensity;
+    intensity = ni;
+    return old;
+}
+unsigned long Ray::getIntensity() {
+    return intensity;
 }

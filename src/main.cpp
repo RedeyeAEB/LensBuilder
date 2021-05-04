@@ -1,4 +1,43 @@
-#include <stdio.h> // Include standard headers
+#include <iostream>
+#include "opticassembly.h"
+#include "optic.h"
+#include "geometry.h"
+#include "emitter.h"
+#include "sensor.h"
+#include "pathtrace.h"
+
+int main() {
+    // Load the image for pathtracing
+    Geometry::Plane backplane(0,0,-20,0,0,1);
+    EmitterImage emit("src/testpattern.ppm", backplane, 10, 10, 587);
+
+    // Create Optic Assembly
+    LensAssembly la;
+    // Add 4 Lenses - Rudolph Design, https://patentimages.storage.googleapis.com/5b/da/59/4075b2ac2d340e/US721240.pdf
+    Geometry::Line axis1(0,0,0,0,0,1);
+    la.push_back(Optic::Lens(axis1, 20, 33, 215, INT64_MAX,1.6132));
+    Geometry::Line axis2(0, 0, 52, 0, 0, 1);
+    la.push_back(Optic::Lens(axis2, 20, 11, -742, 208, 1.60457));
+    Geometry::Line axis3(0, 0, 93, 0, 0, 1);
+    la.push_back(Optic::Lens(axis3, 30, 11, -1113, 252, 1.52110));
+    Geometry::Line axis4(0, 0, 123, 0, 0, 1);
+    la.push_back(Optic::Lens(axis4, 30, 30, 252, -367, 1.61132));   // for test -> nbackr -367->+367
+
+    // Generate the simulated sensor
+    Geometry::Plane backplane2(0,0,150,0,0,1);
+    Sensor sensor(backplane2, 100, 100, 100, 100);
+
+    // Now load all of this into the pathtracing system to create a render
+    Pathtracer::traceLensSystem(emit, la,sensor);
+
+    // And finally, save that output
+    sensor.writeImage("out.ppm");
+}
+
+
+
+
+/*#include <stdio.h> // Include standard headers
 #include <stdlib.h>
 #include <GL/glew.h>    // Include GLEW
 #include <GLFW/glfw3.h> // Include GLFW
@@ -169,7 +208,7 @@ int main() {
     glfwTerminate();
 
     return 0;
-}
+}*/
 
 
 /*#include "interface.h"

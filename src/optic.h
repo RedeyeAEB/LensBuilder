@@ -2,8 +2,10 @@
 #define OPTIC_H
 
 #include <iostream>
+#include <vector>
 #include "light.h"
 
+#pragma message ("raytracing method can only currently deal with light entering on the front side and leaving on the back")
 namespace Optic {
 	class Optic {	// The 'interface'
 		private:
@@ -31,6 +33,15 @@ namespace Optic {
 	        Geometry::Sphere getBack();
 	        long double getRadiusFront();
 	        long double getRadiusBack();
+
+	        // Raytraycer methods
+            // Extension methods of the spherical surface
+            // Currently two for hacky raytracing system
+            Geometry::Point* getClosestValidIntersectionFront(Light::Ray &r);    // Not all intersections with the sphere actually exist - the optical surface is only part of a sphere.
+	        Geometry::Point* getClosestValidIntersectionBack(Light::Ray &r);
+            // The actual path tracing varients
+            //bool checkRayIntersection(Light::Ray &r);
+	        std::vector<Light::Ray> raytracePath(Light::Ray &r);
 	};
 	/*class Mirror : Optic {
 		private:

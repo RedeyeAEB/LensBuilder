@@ -77,16 +77,16 @@ long double Vector::setDZ( long double ndz ) {
 long double Vector::getR() {
 	return std::pow( dx * dx + dy * dy + dz * dz, .5 );
 }
-long double Vector::getMagnitude() {
+long double Vector::getMagnitude() {    // Replace with function reference
     return getR();
 }
-long double Vector::getPhi() {
+long double Vector::getTheta() {
 	if( dx == 0 ) {
 		return 0;
 	}
 	return std::atan( dy / dx );
 }
-long double Vector::getTheta() {
+long double Vector::getPhi() {
 	if( getR() == 0 ) {
 		return 0;
 	}
@@ -102,7 +102,7 @@ long double Vector::setR( long double nr ) {
 	dz *= nr / getR();
 	return old;
 }
-long double Vector::setPhi( long double nPhi ) {
+long double Vector::setTheta( long double nPhi ) {
 	long double r = getR();
 	if( r == 0 ) {
 		return 0;
@@ -112,7 +112,7 @@ long double Vector::setPhi( long double nPhi ) {
 	dy = r * std::sin( getTheta() ) * std::sin( nPhi );
 	return oldPhi;
 }
-long double Vector::setTheta( long double nTheta ) {
+long double Vector::setPhi( long double nTheta ) {
 	long double r = getR();
 	if( r == 0 ) {
 		return 0;
@@ -135,6 +135,23 @@ Vector Vector::getCrossProduct( Vector &o ) {
     long double ndz = dx * o.getDY() - dy * o.getDX();
 
     return Vector(ndx, ndy, ndz);
+}
+long double Vector::getAngleBetween(Vector &o) {
+    return acos(getDotProduct(o)/getMagnitude()/o.getMagnitude());
+}
+Vector Vector::rotateVectorRadians(Vector &rotateAxis, long double radians) {   // Returns this vector, rotated around the other
+    Vector unitAxis = rotateAxis.getUnitVector();
+    long double cosRad = cos(radians);
+    long double sinRad = sin(radians);
+    Vector part1 = Vector(dx, dy, dz); // This method would work better if i implemented operators.
+        part1.setR(part1.getR()*cosRad);
+    Vector part2 = unitAxis.getCrossProduct(*this);
+        part2.setR(part2.getR()*sinRad);
+    Vector tmp = unitAxis.getCrossProduct(*this);
+    Vector part3 = unitAxis.getCrossProduct(tmp);
+        part3.setR(part3.getR()*1-cosRad);
+
+    return Vector(part1.getDX()+part2.getDX()+part3.getDX(), part1.getDY()+part2.getDY()+part3.getDY(), part1.getDZ()+part2.getDZ()+part3.getDZ());
 }
 glm::vec3 Vector::glmvec3()  {
     return glm::vec3(dx,dy,dz);
@@ -226,6 +243,51 @@ Point* Sphere::getIntersection( Line &l ) {	// http://www.ambrsoft.com/TrigoCalc
 	}
 	return nullptr;	// Return null pointer
 }
+std::pair<Point, Point>* Sphere::getIntersections( Line &l ) {	// http://www.ambrsoft.com/TrigoCalc/Sphere/SpherLineIntersection_.htm
+    long double alpha = l.getDX();
+    long double beta = l.getDY();
+    long double gamma = l.getDZ();
+    long double a = alpha * alpha + beta * beta + gamma * gamma;
+    long double b = -2 * ( alpha * ( getX() - l.getX() ) + beta * ( getY() - l.getY() ) + gamma * ( getZ() - l.getZ() ) );
+    long double c = std::pow( ( getX() - l.getX() ), 2 ) + std::pow( ( getY() - l.getY() ), 2 ) + std::pow( ( getZ() - l.getZ() ), 2 ) - r * r;
+
+    if( ( b * b - 4 * a * c ) < 0 ) {
+        return nullptr;
+    }
+
+    long double t1 = ( -1 * b + std::pow( b * b - 4 * a * c, .5 ) ) / ( 2 * a );
+    long double t2 = ( -1 * b - std::pow( b * b - 4 * a * c, .5 ) ) / ( 2 * a );
+    Point i1( l.getX() + alpha * t1, l.getY() + beta * t1, l.getZ() + gamma * t1 );
+    Point i2( l.getX() + alpha * t2, l.getY() + beta * t2, l.getZ() + gamma * t2 );
+    std::pair<Point, Point>* intersections = new std::pair<Point, Point>(i1, i2);
+    return intersections;
+}
 Vector* Sphere::getNormal( Point &p ) {	
 	return new Vector( p.getX() - getX(), p.getY() - getY(), p.getZ() - getZ() );	// Use gradient to determine normal
+}
+Plane::Plane() {
+    setX(0);
+    setY(0);
+    setZ(0);
+    setDX(0);
+    setDY(0);
+    setDZ(0);
+}
+Plane::Plane(long double nx, long double ny, long double nz, long double ndx, long double ndy, long double ndz) {
+    setX(nx);
+    setY(ny);
+    setZ(nz);
+    setDX(ndx);
+    setDY(ndy);
+    setDZ(ndz);
+}
+Geometry::Point* Plane::getIntersection(Geometry::Line &l) {
+    if(getDotProduct(l)==0) {  // 90 degree angle between normal and direction. Ignore parallel case.
+        return nullptr;
+    }
+    long double t = getDX()*(getX()-l.getX()) + getDY()*(getY()-l.getY()) + getDZ()*(getZ()-l.getZ());
+    t /= (getDX()*l.getDX() + getDY()*l.getDY() + getDZ()*l.getDZ());
+
+    Geometry::Point* p = new Geometry::Point(getX()+getDX()*t, getY()+getDY()*t, getZ()+getDZ());
+    return p;
 }
